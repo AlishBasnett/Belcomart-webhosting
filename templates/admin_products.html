@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% set page_title = "Admin Products | Belco Mart" %}
+{% block content %}
+<section class="admin-shell">
+    {% include "_admin_nav.html" %}
+    <div class="admin-main">
+        <div class="admin-title"><div><span class="eyebrow">Inventory</span><h1>Products</h1></div><a class="btn primary" href="{{ url_for('admin_add_product') }}"><i class="fa-solid fa-plus"></i> Add product</a></div>
+        <div class="table-wrap admin-panel">
+            <table>
+                <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td><strong>{{ product.name }}</strong><br><small>{{ product.brand or "" }}</small></td>
+                        <td>{{ product.category_name or "N/A" }}</td>
+                        <td>{{ product.price|currency }}{% if product.sale_price %}<br><small>Sale {{ product.sale_price|currency }}</small>{% endif %}</td>
+                        <td>{{ product.stock_quantity or 0 }}</td>
+                        <td><span class="status">{{ product.status or "available" }}</span></td>
+                        <td class="actions">
+                            <a class="icon-btn" href="{{ url_for('admin_edit_product', product_id=product.id) }}" title="Edit"><i class="fa-solid fa-pen"></i></a>
+                            <form method="post" action="{{ url_for('admin_product_status', product_id=product.id) }}">
+                                <input type="hidden" name="status" value="hidden"><button class="icon-btn" title="Hide"><i class="fa-solid fa-eye-slash"></i></button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin_product_status', product_id=product.id) }}">
+                                <input type="hidden" name="status" value="available"><button class="icon-btn" title="Available"><i class="fa-solid fa-check"></i></button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin_product_status', product_id=product.id) }}">
+                                <input type="hidden" name="status" value="out_of_stock"><button class="icon-btn danger" title="Out of stock"><i class="fa-solid fa-ban"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6">No products found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

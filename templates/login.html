@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% set page_title = "Login | Belco Mart" %}
+{% block content %}
+<section class="auth-page">
+    <form class="auth-card" method="post">
+        <h1>Customer login</h1>
+        <label>Email<input type="email" name="email" required></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="btn primary full">Login</button>
+        <a href="{{ url_for('register') }}">Create an account</a>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,8 @@
+<aside class="admin-nav">
+    <a class="brand compact" href="{{ url_for('admin_dashboard') }}"><img class="brand-logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="Belco Mart logo"><strong>Admin</strong></a>
+    <a href="{{ url_for('admin_dashboard') }}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+    <a href="{{ url_for('admin_products') }}"><i class="fa-solid fa-boxes-stacked"></i> Products</a>
+    <a href="{{ url_for('admin_orders') }}"><i class="fa-solid fa-receipt"></i> Orders</a>
+    <a href="{{ url_for('admin_messages') }}"><i class="fa-solid fa-envelope"></i> Messages</a>
+    <a href="{{ url_for('admin_logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</aside>

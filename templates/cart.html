@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% set page_title = "Cart | Belco Mart" %}
+{% block content %}
+<section class="page-title"><h1>Your cart</h1></section>
+<section class="section cart-layout">
+    <div class="cart-list">
+        {% for item in items %}
+            <div class="cart-row">
+                <img src="{{ product_image(item) }}" alt="{{ item.name }}">
+                <div><h3>{{ item.name }}</h3><p>{{ item.brand or item.category_name }}</p></div>
+                <strong>{{ current_price(item)|currency }}</strong>
+                <form action="{{ url_for('update_cart', cart_id=item.cart_id) }}" method="post" class="qty-form">
+                    <input type="number" min="0" name="quantity" value="{{ item.quantity }}">
+                    <button class="icon-btn" title="Update"><i class="fa-solid fa-rotate"></i></button>
+                </form>
+                <form action="{{ url_for('remove_cart_item', cart_id=item.cart_id) }}" method="post">
+                    <button class="icon-btn danger" title="Remove"><i class="fa-solid fa-trash"></i></button>
+                </form>
+            </div>
+        {% else %}
+            <p>Your cart is empty.</p>
+        {% endfor %}
+    </div>
+    <aside class="summary">
+        <h2>Order summary</h2>
+        <div><span>Subtotal</span><strong>{{ subtotal|currency }}</strong></div>
+        <p>Pickup is free. Delivery fee is calculated at checkout.</p>
+        <a class="btn primary full" href="{{ url_for('checkout') }}">Checkout</a>
+        <a class="btn outline full" href="{{ url_for('products') }}">Continue shopping</a>
+    </aside>
+</section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% set page_title = "Admin Messages | Belco Mart" %}
+{% block content %}
+<section class="admin-shell">
+    {% include "_admin_nav.html" %}
+    <div class="admin-main">
+        <div class="section-head"><span class="eyebrow">Contact</span><h1>Messages</h1></div>
+        <div class="message-list">
+        {% for message in messages %}
+            <article class="admin-panel message-card">
+                <div class="admin-title">
+                    <div><h2>{{ message.subject or "Customer message" }}</h2><p>{{ message.name }} · {{ message.email }} · {{ message.phone }}</p></div>
+                    <span class="status">{{ message.status or "new" }}</span>
+                </div>
+                <p>{{ message.message }}</p>
+                <form method="post" class="inline-form">
+                    <input type="hidden" name="message_id" value="{{ message.id }}">
+                    <select name="status">
+                        {% for status in statuses %}
+                            <option value="{{ status }}" {% if message.status == status %}selected{% endif %}>{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn small primary">Update</button>
+                </form>
+            </article>
+        {% else %}
+            <p>No messages yet.</p>
+        {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

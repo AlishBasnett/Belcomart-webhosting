@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% set page_title = "Order placed | Belco Mart" %}
+{% block content %}
+<section class="success-page">
+    <i class="fa-solid fa-circle-check"></i>
+    <h1>Order received</h1>
+    <p>Thanks for shopping with Belco Mart. We will confirm your order shortly.</p>
+    {% if order %}
+        <div class="success-number">Order number: <strong>{{ order.order_number or ("#" ~ order.id) }}</strong></div>
+        <p>Total: <strong>{{ order.total_amount|currency }}</strong></p>
+    {% endif %}
+    <a class="btn primary" href="{{ url_for('products') }}">Shop more</a>
+</section>
+{% endblock %}

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title or store.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="topbar">
+            <span><i class="fa-solid fa-location-dot"></i> {{ store.location }}</span>
+            <a href="tel:0452452938"><i class="fa-solid fa-phone"></i> {{ store.phone }}</a>
+        </div>
+        <nav class="nav">
+            <a class="brand" href="{{ url_for('index') }}">
+                <img class="brand-logo" src="{{ url_for('static', filename='images/logo.png') }}" alt="Belco Mart logo">
+                <span><strong>{{ store.name }}</strong><small>{{ store.tagline }}</small></span>
+            </a>
+            <button class="nav-toggle" type="button" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">Home</a>
+                <a href="{{ url_for('products') }}">Products</a>
+                <a href="{{ url_for('contact') }}">Contact</a>
+                <a class="cart-pill" href="{{ url_for('cart') }}"><i class="fa-solid fa-basket-shopping"></i> Cart {{ cart_count }}</a>
+                <a href="{{ url_for('admin_login') }}">Admin</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-wrap">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if simple_message %}
+            <section class="section"><h1>{{ simple_message }}</h1></section>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div>
+            <h3>{{ store.name }}</h3>
+            <p>{{ store.tagline }}</p>
+            <p>Nepalese, Indian, Bangladeshi and South Asian groceries in Belconnen.</p>
+        </div>
+        <div>
+            <h4>Shop</h4>
+            <a href="{{ url_for('products') }}">Fresh groceries</a>
+            <a href="{{ url_for('products') }}">Spices and masala</a>
+            <a href="{{ url_for('products') }}">Snacks and sweets</a>
+        </div>
+        <div>
+            <h4>Contact</h4>
+            <a href="tel:0452452938">{{ store.phone }}</a>
+            <span>{{ store.location }}</span>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

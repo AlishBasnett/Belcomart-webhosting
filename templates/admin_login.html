@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% set page_title = "Admin Login | Belco Mart" %}
+{% block content %}
+<section class="auth-page admin-auth">
+    <form class="auth-card" method="post">
+        <span class="eyebrow">Belco Mart admin</span>
+        <h1>Staff login</h1>
+        <label>Email<input type="email" name="email" value="admin@belcomart.com" required></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="btn primary full">Login</button>
+    </form>
+</section>
+{% endblock %}

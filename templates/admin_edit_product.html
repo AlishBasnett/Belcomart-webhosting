@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% set page_title = "Edit Product | Belco Mart" %}
+{% block content %}
+<section class="admin-shell">
+    {% include "_admin_nav.html" %}
+    <div class="admin-main narrow">
+        <h1>Edit product</h1>
+        <form class="form-panel" method="post" enctype="multipart/form-data">
+            {% include "_product_form.html" %}
+            <button class="btn primary">Update product</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

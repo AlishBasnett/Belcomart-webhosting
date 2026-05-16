@@ -1,0 +1,24 @@
+<article class="product-card">
+    <a class="product-image" href="{{ url_for('product_detail', product_id=product.id) }}">
+        <img src="{{ product_image(product) }}" alt="{{ product.name }}">
+        {% if product.sale_price %}<span class="sale">Sale</span>{% endif %}
+    </a>
+    <div class="product-body">
+        <span class="product-meta">{{ product.category_name or "Grocery" }}</span>
+        <h3><a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}</a></h3>
+        <p>{{ product.brand or "Belco Mart selection" }}</p>
+        <div class="price-row">
+            {% if product.sale_price %}
+                <strong>{{ product.sale_price|currency }}</strong><del>{{ product.price|currency }}</del>
+            {% else %}
+                <strong>{{ product.price|currency }}</strong>
+            {% endif %}
+        </div>
+        {% set unavailable = product.status == "out_of_stock" or (product.stock_quantity is not none and product.stock_quantity <= 0) %}
+        <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post">
+            <button class="btn small {{ 'disabled' if unavailable else 'primary' }}" {% if unavailable %}disabled{% endif %}>
+                <i class="fa-solid fa-cart-plus"></i> {{ "Out of stock" if unavailable else "Add to Cart" }}
+            </button>
+        </form>
+    </div>
+</article>

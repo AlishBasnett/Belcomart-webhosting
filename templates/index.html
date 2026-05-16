@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% set page_title = "Belco Mart | South Asian Grocery Store" %}
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <span class="eyebrow">South Asian groceries in Canberra</span>
+        <h1>Belco Mart</h1>
+        <p class="hero-tagline">Where Quality Meets Affordability</p>
+        <p>Fresh staples, spices, frozen food, sweets and daily essentials for Nepalese, Indian, Bangladeshi and South Asian kitchens.</p>
+        <div class="hero-actions">
+            <a class="btn primary" href="{{ url_for('products') }}"><i class="fa-solid fa-bag-shopping"></i> Shop Now</a>
+            <a class="btn light" href="#specials"><i class="fa-solid fa-tags"></i> View Weekly Specials</a>
+            <a class="btn outline" href="{{ url_for('contact') }}"><i class="fa-solid fa-phone"></i> Contact Store</a>
+        </div>
+    </div>
+    <div class="hero-panel">
+        <div class="mini-card red"><strong>Fresh</strong><span>Vegetables and herbs</span></div>
+        <div class="mini-card green"><strong>Pantry</strong><span>Rice, lentils and atta</span></div>
+        <div class="mini-card teal"><strong>Masala</strong><span>Spices for every recipe</span></div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-head">
+        <span class="eyebrow">Shop by aisle</span>
+        <h2>South Asian essentials</h2>
+    </div>
+    <div class="category-grid">
+        {% for category in categories %}
+            <a class="category-card" href="{{ url_for('products', category=category.id) }}">
+                <i class="fa-solid fa-bowl-rice"></i>
+                <strong>{{ category.name }}</strong>
+                <span>{{ category.description or "Explore Belco Mart favourites" }}</span>
+            </a>
+        {% else %}
+            <p>No categories found. Add categories in your existing database.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section band">
+    <div class="section-head">
+        <span class="eyebrow">Customer favourites</span>
+        <h2>Featured products</h2>
+    </div>
+    <div class="product-grid">
+        {% for product in featured %}
+            {% include "_product_card.html" %}
+        {% else %}
+            <p>No featured products yet. Set `is_featured = true` in the products table.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section" id="specials">
+    <div class="section-head">
+        <span class="eyebrow">This week</span>
+        <h2>Weekly specials</h2>
+    </div>
+    <div class="offer-grid">
+        {% for offer in offers %}
+            <div class="offer-card">
+                <span class="offer-badge"><i class="fa-solid fa-percent"></i></span>
+                <h3>{{ offer.title or offer.name }}</h3>
+                <p>{{ offer.description or "Special savings available in store." }}</p>
+            </div>
+        {% else %}
+            <div class="offer-card"><h3>Fresh deals landing soon</h3><p>Check back for Belco Mart specials.</p></div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section cuisine-strip">
+    <div><strong>Nepali groceries</strong><span>Pickles, chiura, spices</span></div>
+    <div><strong>Indian groceries</strong><span>Atta, masala, snacks</span></div>
+    <div><strong>Bangladeshi groceries</strong><span>Fish, rice, sweets</span></div>
+    <div><strong>Frozen food</strong><span>Momos, paratha, meals</span></div>
+</section>
+{% endblock %}

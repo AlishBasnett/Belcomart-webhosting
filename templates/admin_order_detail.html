@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% set page_title = "Order Detail | Belco Mart" %}
+{% block content %}
+<section class="admin-shell">
+    {% include "_admin_nav.html" %}
+    <div class="admin-main">
+        <div class="admin-title"><div><span class="eyebrow">Order</span><h1>{{ order.order_number or ("#" ~ order.id) }}</h1></div></div>
+        <div class="admin-grid">
+            <section class="admin-panel">
+                <h2>Customer</h2>
+                <p><strong>{{ order.customer_name }}</strong></p>
+                <p>{{ order.customer_phone }}</p>
+                <p>{{ order.customer_email }}</p>
+                <p>{{ order.delivery_address }}</p>
+                <p>{{ order.order_notes }}</p>
+                <form method="post" class="inline-form">
+                    <select name="status">
+                        {% for status in statuses %}
+                            <option value="{{ status }}" {% if order.status == status %}selected{% endif %}>{{ status }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn primary">Update status</button>
+                </form>
+            </section>
+            <section class="admin-panel">
+                <h2>Items</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr><td>{{ item.product_name or item.product_id }}</td><td>{{ item.quantity }}</td><td>{{ item.unit_price|currency }}</td><td>{{ item.subtotal|currency }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="summary inline-summary">
+                    <div><span>Subtotal</span><strong>{{ order.subtotal|currency }}</strong></div>
+                    <div><span>Delivery</span><strong>{{ order.delivery_fee|currency }}</strong></div>
+                    <div><span>Total</span><strong>{{ order.total_amount|currency }}</strong></div>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

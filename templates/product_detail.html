@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% set page_title = product.name ~ " | Belco Mart" %}
+{% block content %}
+<section class="product-detail">
+    <div class="detail-image"><img src="{{ product_image(product) }}" alt="{{ product.name }}"></div>
+    <div class="detail-copy">
+        <span class="eyebrow">{{ product.category_name or "Grocery" }}</span>
+        <h1>{{ product.name }}</h1>
+        <p class="lead">{{ product.description or "A quality South Asian grocery product from Belco Mart." }}</p>
+        <dl class="detail-list">
+            <div><dt>Brand</dt><dd>{{ product.brand or "N/A" }}</dd></div>
+            <div><dt>Origin</dt><dd>{{ product.origin_country or "N/A" }}</dd></div>
+            <div><dt>Unit</dt><dd>{{ product.unit or "Each" }}</dd></div>
+            <div><dt>Stock</dt><dd>{{ product.stock_quantity or 0 }}</dd></div>
+        </dl>
+        <div class="detail-price">
+            {% if product.sale_price %}
+                <strong>{{ product.sale_price|currency }}</strong><del>{{ product.price|currency }}</del>
+            {% else %}
+                <strong>{{ product.price|currency }}</strong>
+            {% endif %}
+        </div>
+        {% set unavailable = product.status == "out_of_stock" or (product.stock_quantity is not none and product.stock_quantity <= 0) %}
+        <form class="inline-form" action="{{ url_for('add_to_cart', product_id=product.id) }}" method="post">
+            <input type="number" name="quantity" value="1" min="1">
+            <button class="btn primary" {% if unavailable %}disabled{% endif %}><i class="fa-solid fa-cart-plus"></i> {{ "Out of stock" if unavailable else "Add to Cart" }}</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

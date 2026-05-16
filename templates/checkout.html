@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% set page_title = "Checkout | Belco Mart" %}
+{% block content %}
+<section class="page-title"><h1>Checkout</h1></section>
+<section class="section checkout-grid">
+    <form class="form-panel" method="post">
+        <h2>Customer details</h2>
+        <label>Name<input name="customer_name" required></label>
+        <label>Phone<input name="phone" required></label>
+        <label>Email<input type="email" name="email"></label>
+        <label>Order type
+            <select name="order_type" id="orderType">
+                <option value="pickup">Pickup</option>
+                <option value="delivery">Delivery</option>
+            </select>
+        </label>
+        <label id="deliveryAddress" class="hidden">Delivery address<textarea name="delivery_address"></textarea></label>
+        <label>Payment method
+            <select name="payment_method">
+                <option value="pay_in_store">Pay in store</option>
+                <option value="cash_on_delivery">Cash on delivery</option>
+                <option value="bank_transfer">Bank transfer</option>
+                <option value="card">Card</option>
+            </select>
+        </label>
+        <label>Order notes<textarea name="order_notes"></textarea></label>
+        <button class="btn primary" type="submit">Place order</button>
+    </form>
+    <aside class="summary">
+        <h2>Your items</h2>
+        {% for item in items %}
+            <div><span>{{ item.quantity }} x {{ item.name }}</span><strong>{{ (current_price(item) * item.quantity)|currency }}</strong></div>
+        {% endfor %}
+        <div><span>Subtotal</span><strong>{{ subtotal|currency }}</strong></div>
+        <div><span>Delivery</span><strong>$0 pickup / $5 delivery</strong></div>
+    </aside>
+</section>
+{% endblock %}

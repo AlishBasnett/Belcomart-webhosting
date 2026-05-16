@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% set page_title = "Admin Orders | Belco Mart" %}
+{% block content %}
+<section class="admin-shell">
+    {% include "_admin_nav.html" %}
+    <div class="admin-main">
+        <div class="section-head"><span class="eyebrow">Orders</span><h1>Manage orders</h1></div>
+        <div class="table-wrap admin-panel">
+            <table>
+                <thead><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Status</th><th>Total</th><th></th></tr></thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.order_number or ("#" ~ order.id) }}</td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.customer_phone }}</td>
+                        <td><span class="status">{{ order.status }}</span></td>
+                        <td>{{ order.total_amount|currency }}</td>
+                        <td><a class="btn small outline" href="{{ url_for('admin_order_detail', order_id=order.id) }}">Open</a></td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6">No orders yet.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

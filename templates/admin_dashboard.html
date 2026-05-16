@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% set page_title = "Admin Dashboard | Belco Mart" %}
+{% block content %}
+<section class="admin-shell">
+    {% include "_admin_nav.html" %}
+    <div class="admin-main">
+        <div class="section-head"><span class="eyebrow">Today at Belco Mart</span><h1>Dashboard</h1></div>
+        <div class="stats-grid">
+            <div><span>Total products</span><strong>{{ stats.products }}</strong></div>
+            <div><span>Categories</span><strong>{{ stats.categories }}</strong></div>
+            <div><span>Total orders</span><strong>{{ stats.orders }}</strong></div>
+            <div><span>Pending</span><strong>{{ stats.pending }}</strong></div>
+            <div><span>Low stock</span><strong>{{ stats.low_stock }}</strong></div>
+        </div>
+        <div class="admin-grid">
+            <section class="admin-panel">
+                <h2>Recent orders</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th></tr></thead>
+                        <tbody>
+                        {% for order in recent_orders %}
+                            <tr>
+                                <td><a href="{{ url_for('admin_order_detail', order_id=order.id) }}">{{ order.order_number or ("#" ~ order.id) }}</a></td>
+                                <td>{{ order.customer_name }}</td>
+                                <td><span class="status">{{ order.status }}</span></td>
+                                <td>{{ order.total_amount|currency }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="4">No recent orders.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="admin-panel">
+                <h2>Recent messages</h2>
+                {% for message in recent_messages %}
+                    <div class="message-line"><strong>{{ message.name }}</strong><span>{{ message.status or "new" }}</span><p>{{ message.message }}</p></div>
+                {% else %}
+                    <p>No messages yet.</p>
+                {% endfor %}
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

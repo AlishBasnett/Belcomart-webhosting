@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% set page_title = "Contact | Belco Mart" %}
+{% block content %}
+<section class="page-title"><span class="eyebrow">Visit or call</span><h1>Contact Belco Mart</h1></section>
+<section class="section contact-grid">
+    <div class="contact-panel">
+        <h2>Belconnen's South Asian grocery stop</h2>
+        <p>Call us for product availability, bulk grocery questions, delivery availability and weekly specials.</p>
+        <div class="contact-item"><i class="fa-solid fa-phone"></i><a href="tel:0452452938">{{ store.phone }}</a></div>
+        <div class="contact-item"><i class="fa-solid fa-location-dot"></i><span>{{ store.location }}</span></div>
+    </div>
+    <form class="form-panel" method="post">
+        <label>Name<input name="name" required></label>
+        <label>Email<input type="email" name="email"></label>
+        <label>Phone<input name="phone"></label>
+        <label>Subject<input name="subject"></label>
+        <label>Message<textarea name="message" required></textarea></label>
+        <button class="btn primary" type="submit">Send message</button>
+    </form>
+</section>
+{% endblock %}

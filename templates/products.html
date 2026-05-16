@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% set page_title = "Products | Belco Mart" %}
+{% block content %}
+<section class="page-title">
+    <span class="eyebrow">Belco Mart shelves</span>
+    <h1>Groceries, spices, snacks and fresh essentials</h1>
+</section>
+
+<section class="section">
+    <form class="filters" method="get">
+        <input type="search" name="q" placeholder="Search rice, masala, noodles..." value="{{ search }}">
+        <select name="category">
+            <option value="">All categories</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if active_category == category.id %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn primary" type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </form>
+    <div class="product-grid">
+        {% for product in products %}
+            {% include "_product_card.html" %}
+        {% else %}
+            <p>No products matched your search.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
