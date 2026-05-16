@@ -380,6 +380,11 @@ def cart_items():
 
 @app.route("/")
 def index():
+    return redirect(url_for("login"))
+
+
+@app.route("/home")
+def home():
     categories = query_db(
         """
         SELECT category_id AS id, category_name AS name, description, image_path, status
