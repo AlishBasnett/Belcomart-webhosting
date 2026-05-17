@@ -303,26 +303,6 @@ def ensure_database_schema(conn):
 
 def seed_database_if_empty(conn):
     with conn.cursor() as cursor:
-        admin_password = os.getenv("ADMIN_PASSWORD", "BelcoAdmin@2026")
-        cursor.execute(
-            """
-            INSERT INTO users (full_name, email, password_hash, role, status)
-            VALUES (%s, %s, %s, %s, %s)
-            ON CONFLICT (email) DO UPDATE SET
-                full_name = EXCLUDED.full_name,
-                password_hash = EXCLUDED.password_hash,
-                role = EXCLUDED.role,
-                status = EXCLUDED.status
-            """,
-            (
-                "Belco Mart Admin",
-                "admin@belcomart.com",
-                generate_password_hash(admin_password),
-                "admin",
-                "active",
-            ),
-        )
-
         cursor.execute("SELECT COUNT(*) AS count FROM categories")
         categories_empty = cursor.fetchone()["count"] == 0
         cursor.execute("SELECT COUNT(*) AS count FROM products")
@@ -349,6 +329,35 @@ def seed_database_if_empty(conn):
                     WHERE categories.category_name = seed_categories.category_name
                 )
                 """
+            )
+
+    ensure_admin_user(conn)
+
+
+def ensure_admin_user(conn):
+    admin_email = "admin@belcomart.com"
+    admin_password = os.getenv("ADMIN_PASSWORD", "BelcoAdmin@2026")
+    password_hash = generate_password_hash(admin_password)
+
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT user_id FROM users WHERE email = %s ORDER BY user_id LIMIT 1", (admin_email,))
+        existing = cursor.fetchone()
+        if existing:
+            cursor.execute(
+                """
+                UPDATE users
+                SET full_name = %s, password_hash = %s, role = %s, status = %s
+                WHERE user_id = %s
+                """,
+                ("Belco Mart Admin", password_hash, "admin", "active", existing["user_id"]),
+            )
+        else:
+            cursor.execute(
+                """
+                INSERT INTO users (full_name, email, password_hash, role, status)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                ("Belco Mart Admin", admin_email, password_hash, "admin", "active"),
             )
 
         if products_empty:
@@ -859,6 +868,19 @@ def admin_login():
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
+        if email == "admin@belcomart.com":
+            conn = None
+            try:
+                conn = get_db_connection()
+                ensure_admin_user(conn)
+                conn.commit()
+            except Error:
+                if conn:
+                    conn.rollback()
+                app.logger.exception("Admin user setup failed")
+            finally:
+                if conn:
+                    conn.close()
         user = query_db(
             "SELECT user_id AS id, full_name AS name, password_hash AS password, users.* FROM users WHERE email = %s AND role = 'admin'",
             (email,),
