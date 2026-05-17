@@ -67,6 +67,11 @@ def get_db_connection():
     return conn
 
 
+def initialize_database():
+    conn = get_db_connection()
+    conn.close()
+
+
 def quote_identifier(name):
     if name not in PRIMARY_KEYS:
         raise ValueError(f"Unsupported table: {name}")
@@ -292,7 +297,125 @@ def ensure_database_schema(conn):
     """
     with conn.cursor() as cursor:
         cursor.execute(schema)
+    seed_database_if_empty(conn)
     conn.commit()
+
+
+def seed_database_if_empty(conn):
+    with conn.cursor() as cursor:
+        admin_password = os.getenv("ADMIN_PASSWORD", "BelcoAdmin@2026")
+        cursor.execute(
+            """
+            INSERT INTO users (full_name, email, password_hash, role, status)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (email) DO UPDATE SET
+                full_name = EXCLUDED.full_name,
+                password_hash = EXCLUDED.password_hash,
+                role = EXCLUDED.role,
+                status = EXCLUDED.status
+            """,
+            (
+                "Belco Mart Admin",
+                "admin@belcomart.com",
+                generate_password_hash(admin_password),
+                "admin",
+                "active",
+            ),
+        )
+
+        cursor.execute("SELECT COUNT(*) AS count FROM categories")
+        categories_empty = cursor.fetchone()["count"] == 0
+        cursor.execute("SELECT COUNT(*) AS count FROM products")
+        products_empty = cursor.fetchone()["count"] == 0
+
+        if categories_empty or products_empty:
+            cursor.execute(
+                """
+                INSERT INTO categories (category_name, description, image_path, status)
+                SELECT category_name, description, image_path, status
+                FROM (
+                    VALUES
+                        ('Rice & Grains', 'Basmati rice, atta, flours, grains, and everyday pantry staples.', NULL, 'active'),
+                        ('Spices', 'Whole and ground spices for South Asian cooking.', NULL, 'active'),
+                        ('Snacks', 'Namkeen, biscuits, sweets, and quick bites.', NULL, 'active'),
+                        ('Lentils', 'Dals, beans, chickpeas, and pulses.', NULL, 'active'),
+                        ('Frozen Food', 'Frozen breads, vegetables, snacks, and ready-to-cook favourites.', NULL, 'active'),
+                        ('Drinks', 'Tea, juices, soft drinks, and traditional beverages.', NULL, 'active'),
+                        ('Household', 'Kitchen, cleaning, prayer, and daily household essentials.', NULL, 'active')
+                ) AS seed_categories(category_name, description, image_path, status)
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM categories
+                    WHERE categories.category_name = seed_categories.category_name
+                )
+                """
+            )
+
+        if products_empty:
+            cursor.execute(
+                """
+                WITH seed_products AS (
+                    SELECT *
+                    FROM (
+                        VALUES
+                            ('Rice & Grains', 'Premium Basmati Rice 5kg', 'India Gate', 'Long-grain aromatic basmati rice for biryani and everyday meals.', 'India', 18.99, 16.99, 30, '5kg bag', 'available', true, NULL),
+                            ('Rice & Grains', 'Sona Masoori Rice 5kg', 'Lal Qilla', 'Medium-grain rice for daily cooking, curd rice, and light meals.', 'India', 15.99, NULL, 24, '5kg bag', 'available', false, NULL),
+                            ('Rice & Grains', 'Whole Wheat Atta 10kg', 'Aashirvaad', 'Whole wheat flour for soft rotis, chapatis, and parathas.', 'India', 22.99, 20.99, 18, '10kg bag', 'available', true, NULL),
+                            ('Rice & Grains', 'Besan Gram Flour 1kg', 'Pattu', 'Fine chickpea flour for pakoras, kadhi, sweets, and batters.', 'Australia', 5.49, NULL, 40, '1kg pack', 'available', false, NULL),
+                            ('Spices', 'Turmeric Powder 200g', 'MDH', 'Bright haldi powder for curries, dals, marinades, and rice dishes.', 'India', 3.49, NULL, 45, '200g pack', 'available', true, NULL),
+                            ('Spices', 'Garam Masala 100g', 'Everest', 'Aromatic spice blend for curries, gravies, and finishing dishes.', 'India', 3.99, NULL, 36, '100g pack', 'available', false, NULL),
+                            ('Spices', 'Cumin Seeds 200g', 'Shan', 'Whole jeera seeds for tempering, tadka, and spice mixes.', 'Pakistan', 4.49, NULL, 32, '200g pack', 'available', false, NULL),
+                            ('Spices', 'Kashmiri Chilli Powder 200g', 'TRS', 'Mild chilli powder with deep red colour for curries and marinades.', 'India', 4.99, 4.49, 25, '200g pack', 'available', true, NULL),
+                            ('Spices', 'Coriander Powder 200g', 'MDH', 'Ground dhania powder for everyday South Asian cooking.', 'India', 3.79, NULL, 30, '200g pack', 'available', false, NULL),
+                            ('Snacks', 'Aloo Bhujia 400g', 'Haldiram''s', 'Classic crispy potato and gram flour namkeen.', 'India', 4.99, NULL, 50, '400g pack', 'available', true, NULL),
+                            ('Snacks', 'Masala Peanuts 200g', 'Haldiram''s', 'Crunchy peanuts coated with spicy masala.', 'India', 3.49, NULL, 42, '200g pack', 'available', false, NULL),
+                            ('Snacks', 'Parle-G Biscuits 800g', 'Parle', 'Popular glucose biscuits for tea time and lunch boxes.', 'India', 5.99, NULL, 35, '800g pack', 'available', false, NULL),
+                            ('Snacks', 'Soan Papdi 500g', 'Bikano', 'Flaky traditional Indian sweet for sharing and gifting.', 'India', 6.49, 5.99, 20, '500g box', 'available', true, NULL),
+                            ('Lentils', 'Toor Dal 2kg', 'Pattu', 'Split pigeon peas for classic dal, sambar, and khichdi.', 'Australia', 8.99, NULL, 28, '2kg pack', 'available', true, NULL),
+                            ('Lentils', 'Moong Dal 1kg', 'Pattu', 'Split yellow mung beans for light dals and soups.', 'Australia', 5.99, NULL, 34, '1kg pack', 'available', false, NULL),
+                            ('Lentils', 'Red Lentils Masoor Dal 1kg', 'TRS', 'Quick-cooking red lentils for soups, curries, and stews.', 'India', 4.99, NULL, 38, '1kg pack', 'available', false, NULL),
+                            ('Lentils', 'Kabuli Chana 1kg', 'Pattu', 'Dried white chickpeas for chole, salads, and curries.', 'Australia', 5.49, NULL, 26, '1kg pack', 'available', false, NULL),
+                            ('Lentils', 'Urad Dal 1kg', 'TRS', 'Black gram dal for dosa batter, dal makhani, and papad recipes.', 'India', 5.79, NULL, 22, '1kg pack', 'available', false, NULL),
+                            ('Frozen Food', 'Plain Paratha 20 Pack', 'Kawan', 'Frozen layered flatbread, ready to heat on a pan.', 'Malaysia', 9.99, 8.99, 22, '20 pack', 'available', true, NULL),
+                            ('Frozen Food', 'Vegetable Samosa 12 Pack', 'Deep', 'Crispy pastry filled with spiced vegetables.', 'India', 7.99, NULL, 18, '12 pack', 'available', false, NULL),
+                            ('Frozen Food', 'Paneer 1kg', 'Gopi', 'Frozen paneer cubes for palak paneer, tikka, and curries.', 'Australia', 13.99, NULL, 16, '1kg pack', 'available', true, NULL),
+                            ('Frozen Food', 'Garlic Naan 5 Pack', 'Haldiram''s', 'Soft frozen garlic naan ready to heat and serve.', 'India', 6.99, NULL, 20, '5 pack', 'available', false, NULL),
+                            ('Drinks', 'Masala Chai Tea 500g', 'Wagh Bakri', 'Strong black tea blend for masala chai.', 'India', 7.49, NULL, 30, '500g pack', 'available', true, NULL),
+                            ('Drinks', 'Mango Drink 1L', 'Maaza', 'Sweet mango fruit drink served chilled.', 'India', 3.49, NULL, 40, '1L bottle', 'available', false, NULL),
+                            ('Drinks', 'Rose Syrup 750ml', 'Rooh Afza', 'Traditional rose-flavoured syrup for milk, water, and desserts.', 'Pakistan', 6.99, NULL, 24, '750ml bottle', 'available', false, NULL),
+                            ('Drinks', 'Thums Up 300ml', 'Thums Up', 'Bold Indian cola-style soft drink.', 'India', 2.49, NULL, 36, '300ml bottle', 'available', false, NULL),
+                            ('Household', 'Stainless Steel Masala Box', 'Generic', 'Round spice storage box with small stainless steel containers.', 'India', 19.99, NULL, 10, 'each', 'available', true, NULL),
+                            ('Household', 'Incense Sticks Sandalwood', 'Cycle', 'Sandalwood fragrance incense sticks for home use.', 'India', 2.99, NULL, 50, 'pack', 'available', false, NULL),
+                            ('Household', 'Pressure Cooker Gasket', 'Prestige', 'Replacement gasket for compatible pressure cookers.', 'India', 4.99, NULL, 14, 'each', 'available', false, NULL),
+                            ('Household', 'Copper Pooja Diya', 'Generic', 'Small copper diya for prayer and festival use.', 'India', 3.99, NULL, 25, 'each', 'available', false, NULL)
+                    ) AS products(category_name, product_name, brand, description, origin_country, price, sale_price, stock_quantity, unit, status, is_featured, image_path)
+                )
+                INSERT INTO products (
+                    category_id, product_name, brand, description, origin_country, price,
+                    sale_price, stock_quantity, unit, status, is_featured, image_path
+                )
+                SELECT
+                    categories.category_id,
+                    seed_products.product_name,
+                    seed_products.brand,
+                    seed_products.description,
+                    seed_products.origin_country,
+                    seed_products.price,
+                    seed_products.sale_price,
+                    seed_products.stock_quantity,
+                    seed_products.unit,
+                    seed_products.status,
+                    seed_products.is_featured,
+                    seed_products.image_path
+                FROM seed_products
+                JOIN categories ON categories.category_name = seed_products.category_name
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM products
+                    WHERE products.product_name = seed_products.product_name
+                )
+                """
+            )
 
 
 def get_cart_session_id():
@@ -376,6 +499,12 @@ def cart_items():
         """,
         (sid,),
     )
+
+
+@app.before_request
+def prepare_database():
+    if request.endpoint != "healthz" and not SCHEMA_READY:
+        initialize_database()
 
 
 @app.route("/")
