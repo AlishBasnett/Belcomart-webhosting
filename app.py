@@ -447,7 +447,7 @@ def product_image(product):
         if str(image).startswith(("http://", "https://", "/static/")):
             return image
         return url_for("static", filename=str(image).lstrip("/"))
-    return "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=900&q=80"
+    return None
 
 
 def require_admin(view):

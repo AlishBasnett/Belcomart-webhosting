@@ -1,6 +1,11 @@
 <article class="product-card">
+    {% set image_src = product_image(product) %}
     <a class="product-image" href="{{ url_for('product_detail', product_id=product.id) }}">
-        <img src="{{ product_image(product) }}" alt="{{ product.name }}">
+        {% if image_src %}
+            <img src="{{ image_src }}" alt="{{ product.name }}">
+        {% else %}
+            <span class="no-image-label">{{ product.category_name or "Belco Mart" }}</span>
+        {% endif %}
         {% if product.sale_price %}<span class="sale">Sale</span>{% endif %}
     </a>
     <div class="product-body">

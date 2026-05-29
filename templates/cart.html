@@ -5,8 +5,13 @@
 <section class="section cart-layout">
     <div class="cart-list">
         {% for item in items %}
+            {% set image_src = product_image(item) %}
             <div class="cart-row">
-                <img src="{{ product_image(item) }}" alt="{{ item.name }}">
+                {% if image_src %}
+                    <img src="{{ image_src }}" alt="{{ item.name }}">
+                {% else %}
+                    <span class="cart-image-empty">{{ item.category_name or "Item" }}</span>
+                {% endif %}
                 <div><h3>{{ item.name }}</h3><p>{{ item.brand or item.category_name }}</p></div>
                 <strong>{{ current_price(item)|currency }}</strong>
                 <form action="{{ url_for('update_cart', cart_id=item.cart_id) }}" method="post" class="qty-form">

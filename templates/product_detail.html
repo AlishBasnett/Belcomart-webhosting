@@ -2,7 +2,12 @@
 {% set page_title = product.name ~ " | Belco Mart" %}
 {% block content %}
 <section class="product-detail">
-    <div class="detail-image"><img src="{{ product_image(product) }}" alt="{{ product.name }}"></div>
+    {% set image_src = product_image(product) %}
+    {% if image_src %}
+        <div class="detail-image"><img src="{{ image_src }}" alt="{{ product.name }}"></div>
+    {% else %}
+        <div class="detail-image no-image-detail"><span>{{ product.category_name or "Belco Mart" }}</span></div>
+    {% endif %}
     <div class="detail-copy">
         <span class="eyebrow">{{ product.category_name or "Grocery" }}</span>
         <h1>{{ product.name }}</h1>
