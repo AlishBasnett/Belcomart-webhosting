@@ -1,6 +1,6 @@
 <article class="product-card">
     {% set image_src = product_image(product) %}
-    <a class="product-image" href="{{ url_for('product_detail', product_id=product.id) }}">
+    <a class="product-image {{ 'has-image' if image_src else 'no-image' }}" href="{{ url_for('product_detail', product_id=product.id) }}">
         {% if image_src %}
             <img src="{{ image_src }}" alt="{{ product.name }}">
         {% else %}
